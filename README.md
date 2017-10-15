@@ -4,7 +4,7 @@ Go client for the [maild](https://github.com/vbogretsov/maild) service.
 
 ## Usage
 
-``` {Go}
+```go
 
 import (
     "log"
