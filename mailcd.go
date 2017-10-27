@@ -5,10 +5,6 @@ import (
 	"github.com/vmihailenco/msgpack"
 )
 
-type Sender interface {
-	Send(lang string, tid string, args interface{}) error
-}
-
 type Address struct {
 	Name  string
 	Email string
@@ -20,6 +16,10 @@ type Request struct {
 	TemplateArgs interface{}
 	To           []Address
 	Cc           []Address
+}
+
+type Sender interface {
+	Send(*Request) error
 }
 
 type AMQPSender struct {
