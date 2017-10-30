@@ -1,8 +1,7 @@
 package mailcd
 
 import (
-	"github.com/streadway/amqp"
-	"github.com/vmihailenco/msgpack"
+	"net/rpc"
 )
 
 type Address struct {
@@ -19,44 +18,18 @@ type Request struct {
 }
 
 type Sender interface {
-	Send(*Request) error
+	Send(Request) error
 }
 
-type AMQPSender struct {
-	exchange string
-	key      string
-	channel  *amqp.Channel
+type rpcSender struct {
+	client *rpc.Client
 }
 
-func (s *AMQPSender) Send(r *Request) error {
-	body, err := msgpack.Marshal(r)
-
-	if err != nil {
-		return err
-	}
-
-	msg := amqp.Publishing{
-		Body: body,
-	}
-
-	return s.channel.Publish(s.exchange, s.key, false, false, msg)
+func (s *rpcSender) Send(r Request) error {
+	reply := struct{}{}
+	return s.client.Call("Maild.Send", r, &reply)
 }
 
-func (s *AMQPSender) Close() error {
-	return s.channel.Close()
-}
-
-func NewAMQPSender(conn *amqp.Connection, exchange, key string) (*AMQPSender, error) {
-	channel, err := conn.Channel()
-	if err != nil {
-		return nil, err
-	}
-
-	sender := AMQPSender{
-		channel:  channel,
-		exchange: exchange,
-		key:      key,
-	}
-
-	return &sender, nil
+func NewRPCSender(client *rpc.Client) Sender {
+	return &rpcSender{client: client}
 }

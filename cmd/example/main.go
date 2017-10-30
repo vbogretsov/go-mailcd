@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"net/rpc"
 	"os"
 
 	"github.com/streadway/amqp"
+	"github.com/vbogretsov/amqprpc"
 	"github.com/vbogretsov/go-mailcd"
 )
 
@@ -15,12 +17,15 @@ func main() {
 		return
 	}
 
-	sender, err := mailcd.NewAMQPSender(conn, "maild", "maild")
+	clientCodec, err := amqprpc.NewClientCodec(conn, "maild")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		return
 	}
-	defer sender.Close()
+	defer clientCodec.Close()
+
+	client := rpc.NewClientWithCodec(clientCodec)
+	sender := mailcd.NewRPCSender(client)
 
 	req := mailcd.Request{
 		TemplateLang: "en",
@@ -35,7 +40,7 @@ func main() {
 		},
 	}
 
-	if err := sender.Send(&req); err != nil {
+	if err := sender.Send(req); err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		return
 	}
