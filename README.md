@@ -25,23 +25,24 @@ func main() {
     }
     defer client.Close()
 
-    sender := mailcd.NewRPC(client)
+    sender := mailcd.NewRPCSender(client)
 
-    err := sender.Send("en", "email-template-name", map[string]interface{}{
-        "To": []string{
-            "to1@mail.com",
-            "to2@mail.com",
+    req := mailcd.Request{
+        TemplateLang: "en",
+        TemplateName: "test",
+        TemplateArgs: map[string]interface{}{
+            "Username": "Donald",
         },
-        "Cc": []string{
-            "cc1@mail.com",
-            "cc2@mail.com"
+        To: []mailcd.Address{
+            {
+                Email: "to1@mail.com",
+            },
         },
-        "EmailTemplateArg1": "arg1",
-        "EmailTemplateArg2": "arg2",
-    })
+    }
 
-    if err != nil {
-        log.Fatal(err)
+    if err := sender.Send(req); err != nil {
+        fmt.Fprintf(os.Stderr, "error: %v\n", err)
+        return
     }
 }
 
