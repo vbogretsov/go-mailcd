@@ -29,7 +29,7 @@ func main() {
 
 	req := mailcd.Request{
 		TemplateLang: "en",
-		TemplateName: "test",
+		TemplateName: "example",
 		TemplateArgs: map[string]interface{}{
 			"Username": "Donald",
 		},
