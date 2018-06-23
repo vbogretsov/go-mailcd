@@ -10,22 +10,27 @@ import (
     "log"
     "net/rpc"
 
+    "github.com/streadway/amqp"
     "github.com/vbogretsov/go-mailcd"
 )
 
 
-func createRPCClient() (*rpc.Client, error) {
-    // create RPC client.
+func createAMQPConnection() (*amqp.Connection, error) {
+    // create and return AMQP connection.
 }
 
 func main() {
-    client, err := createRPCClient()
+    con, err := createAMQPConnection()
     if err != nil {
         log.Fatal(err)
     }
-    defer client.Close()
+    defer con.Close()
 
-    sender := mailcd.NewRPCSender(client)
+    sender, err := mailcd.New(con, "maild")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer sender.Close()
 
     req := mailcd.Request{
         TemplateLang: "en",
