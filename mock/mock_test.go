@@ -9,25 +9,33 @@ import (
 	"github.com/vbogretsov/go-mailcd/mock"
 )
 
-func TestSendAddEmailToInbox(t *testing.T) {
+func TestSendConcurrent(t *testing.T) {
 	sender := mock.New()
 
-	req := mailcd.Request{
+	to := []mailcd.Address{{Email: "to1@mail.com"}, {Email: "to2@mail.com"}}
+	cc := []mailcd.Address{{Email: "cc1@mail.com"}, {Email: "cc2@mail.com"}}
+
+	args := map[string]interface{}{"test": "test"}
+
+	exp := mailcd.Request{
 		TemplateLang: "en",
 		TemplateName: "test",
-		TemplateArgs: map[string]interface{}{
-			"test": "test",
-		},
-		To: []mailcd.Address{
-			{
-				Email: "to1@mail.com",
-			},
-		},
+		TemplateArgs: args,
+		To:           to,
+		Cc:           cc,
 	}
 
-	err := sender.Send(req)
+	err := sender.Send(exp)
+
+	checkInbox := func(addrs []mailcd.Address) {
+		for _, addr := range addrs {
+			act, ok := sender.ReadMail(addr.Email)
+			require.True(t, ok)
+			require.Equal(t, exp, act)
+		}
+	}
 
 	require.Nil(t, err, "send error: %v", err)
-	require.Equal(t, 1, len(sender.Inbox))
-	require.Equal(t, req, sender.Inbox[0])
+	checkInbox(to)
+	checkInbox(cc)
 }
