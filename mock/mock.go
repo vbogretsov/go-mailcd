@@ -4,7 +4,7 @@ import (
 	"container/list"
 	"sync"
 
-	"github.com/vbogretsov/go-mailcd"
+	"github.com/vbogretsov/go-mail"
 )
 
 // Sender represent mock for mailcd.Sender.

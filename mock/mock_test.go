@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/vbogretsov/go-mailcd"
-	"github.com/vbogretsov/go-mailcd/mock"
+	"github.com/vbogretsov/go-mail"
+	"github.com/vbogretsov/go-mail/mock"
 )
 
 func TestSendConcurrent(t *testing.T) {

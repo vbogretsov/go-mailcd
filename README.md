@@ -11,9 +11,8 @@ import (
     "net/rpc"
 
     "github.com/streadway/amqp"
-    "github.com/vbogretsov/go-mailcd"
+    "github.com/vbogretsov/go-mail"
 )
-
 
 func createAMQPConnection() (*amqp.Connection, error) {
     // create and return AMQP connection.
@@ -26,7 +25,7 @@ func main() {
     }
     defer con.Close()
 
-    sender, err := mailcd.New(con, "maild")
+    sender, err := mail.NewSender(con, "maild")
     if err != nil {
         log.Fatal(err)
     }

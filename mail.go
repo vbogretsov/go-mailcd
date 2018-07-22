@@ -49,7 +49,7 @@ func (s *amqpSender) Close() error {
 }
 
 // New creates a new maild client.
-func New(conn *amqp.Connection, topic string) (Sender, error) {
+func NewSender(conn *amqp.Connection, topic string) (Sender, error) {
 	ch, err := conn.Channel()
 	if err != nil {
 		return nil, err
